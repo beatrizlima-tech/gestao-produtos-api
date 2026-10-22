@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,6 +67,27 @@ public class ProdutoServiceTest {
 
         assertFalse(captor.getValue().isBefore(antes));
         assertFalse(captor.getValue().isAfter(depois));
+    }
+
+    @Test
+    void deveExcluirDefinitivamenteProdutoDaLixeira() {
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setDataExclusao(LocalDateTime.now().minusDays(5));
+
+        when(produtoRepository.findById(1))
+                .thenReturn(Optional.of(produto));
+
+        //ACT
+        produtoService.excluirDefinitivamente(1);
+
+        //ASSERT
+        verify(produtoRepository).delete(produto);
+
+
     }
 
 }

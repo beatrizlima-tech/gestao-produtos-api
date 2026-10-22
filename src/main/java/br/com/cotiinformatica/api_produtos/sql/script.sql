@@ -2,11 +2,12 @@
 
 CREATE TABLE produtos (
     id                      SERIAL                  PRIMARY KEY,
-    nome                    VARCHAR(100)            NOT NULL,
+    nome                    VARCHAR(150)            NOT NULL,
+    descricao               VARCHAR(500)            NULL,
     preco                   DECIMAL(10,2)           NOT NULL,
     quantidade              INTEGER                 NOT NULL,
-    categoria               VARCHAR(30)                NOT NULL,
-    data_cadastro           TIMESTAMP               DEFAULT CURRENT_TIMESTAMP
+    categoria               VARCHAR(30)             NOT NULL,
+    data_cadastro           TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_categoria
     CHECK (categoria IN(

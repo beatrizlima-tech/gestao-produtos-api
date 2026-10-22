@@ -1,10 +1,16 @@
 package br.com.cotiinformatica.api_produtos.dtos;
 
+import java.time.LocalDateTime;
+
 public record ProdutoResponseDto(
         Integer id,
         String nome,
+        String descricao,
         Double preco,
         Integer quantidade,
-        Double total
+        Double total,
+        LocalDateTime dataCadastro,
+        LocalDateTime dataAtualizacao,
+        LocalDateTime dataExclusao
 ) {
 }

@@ -3,10 +3,8 @@ package br.com.cotiinformatica.api_produtos;
 import br.com.cotiinformatica.api_produtos.dtos.ProdutoRequestDto;
 import br.com.cotiinformatica.api_produtos.dtos.ProdutoResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -34,15 +32,20 @@ class ApiProdutosApplicationTests {
 	@Autowired
 	private ObjectMapper objectMapper; //manipular JSON
 
+	@BeforeEach
+	void configurarObjectMapper(){
+		objectMapper.registerModule(new JavaTimeModule());
+	}
+
 	private static Integer produtoId;
 
 	@Test
 	@Order(1)
 	void deveCadastrarProduto() throws Exception {
 
-		//ARRANGE
 		var request = new ProdutoRequestDto(
 				"Notebook Dell",
+				"Notebook Dell para trabalho e estudos",
 				5000.0,
 				10
 		);
@@ -63,6 +66,7 @@ class ApiProdutosApplicationTests {
 		//ASSERT
 		assertNotEquals(0, response.id());
 		assertEquals(request.nome(), response.nome());
+		assertEquals(request.descricao(), response.descricao());
 		assertEquals(request.preco(), response.preco());
 		assertEquals(request.quantidade(), response.quantidade());
 	}
@@ -110,14 +114,13 @@ class ApiProdutosApplicationTests {
 	@Order(4)
 	void deveAtualizarProduto() throws Exception {
 
-		//ARRANGE
 		var request = new ProdutoRequestDto(
 				"Notebook Dell Gamer",
+				"Notebook gamer de alto desempenho.",
 				6500.0,
 				8
 		);
 
-		//ACT
 		var result = mockMvc.perform(put("/api/v1/produtos/" + produtoId)
 						.contentType("application/json")
 						.content(objectMapper.writeValueAsString(request)))
@@ -131,6 +134,7 @@ class ApiProdutosApplicationTests {
 		assertNotNull(response);
 		assertEquals(produtoId, response.id());
 		assertEquals(request.nome(), response.nome());
+		assertEquals(request.descricao(), response.descricao());
 		assertEquals(request.preco(), response.preco());
 		assertEquals(request.quantidade(), response.quantidade());
 	}

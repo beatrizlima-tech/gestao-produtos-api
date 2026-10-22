@@ -8,8 +8,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Tag(
         name = "Gestão de Produtos",
@@ -38,8 +41,8 @@ public class ProdutosController {
     })
     @PostMapping
     public ResponseEntity<?> post(@Valid @RequestBody ProdutoRequestDto request) {
-        var response = produtoService.criar(request);
-        return ResponseEntity.status(201).body(response);
+
+        return ResponseEntity.status(201).body(produtoService.criar(request));
     }
 
     @Operation(
@@ -65,8 +68,7 @@ public class ProdutosController {
             @PathVariable Integer id,
             @Valid @RequestBody ProdutoRequestDto request) {
 
-        var response = produtoService.atualizar(id, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(produtoService.atualizar(id, request));
     }
 
     @Operation(
@@ -85,8 +87,8 @@ public class ProdutosController {
     })
     @DeleteMapping("{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
-        var response = produtoService.excluir(id);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(produtoService.excluir(id));
     }
 
     @Operation(
@@ -101,8 +103,9 @@ public class ProdutosController {
     })
     @GetMapping
     public ResponseEntity<?> getAll() {
-        var response = produtoService.consultar();
-        return ResponseEntity.status(200).body(response);
+
+        return ResponseEntity.status(200).body(produtoService.consultar());
+
     }
 
     @Operation(
@@ -121,7 +124,60 @@ public class ProdutosController {
     })
     @GetMapping("{id}")
     public ResponseEntity<?> getById(@PathVariable Integer id) {
-        var response = produtoService.obterPorId(id);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(produtoService.obterPorId(id));
+    }
+
+    @Operation(
+            summary = "Consultar lixeira",
+            description = "Lista os produtos enviados para a lixeira."
+    )
+    @GetMapping("/lixeira")
+    public ResponseEntity<?> getLixeira() {
+
+        return ResponseEntity.ok(produtoService.consultarLixeira());
+
+    }
+
+    @Operation(
+            summary = "Restaurar produto",
+            description = "Restaura um produto excluído dentro do prazo de 30 dias."
+    )
+    @PatchMapping("/{id}/restaurar")
+    public ResponseEntity<?> restaurar(@PathVariable Integer id) {
+
+        return ResponseEntity.ok(produtoService.restaurar(id));
+    }
+
+    @Operation(
+            summary = "Excluir produto definitivamente.",
+            description = "Remove permanentemente um produto que está na lixeira."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Produto excluído definitivamente."
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Produto não encontrado."
+            )
+    })
+    @DeleteMapping("/{id}/definitivo")
+    public ResponseEntity<Void> excluirDefinitivamente(
+            @PathVariable Integer id) {
+
+        produtoService.excluirDefinitivamente(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> tratarConflito(
+            IllegalStateException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of("erro", ex.getMessage()));
     }
 }

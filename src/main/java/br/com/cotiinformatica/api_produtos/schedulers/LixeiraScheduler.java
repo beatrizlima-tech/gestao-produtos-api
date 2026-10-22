@@ -11,7 +11,7 @@ public class LixeiraScheduler {
     @Autowired
     private ProdutoService produtoService;
 
-    @Scheduled(cron= "0 0 3 * * * ", zone = "America/Sao_Paulo")
+    @Scheduled(cron = "0 0 3 * * *", zone = "America/Sao_Paulo")
     public void executarLimpeza() {
 
         produtoService.limparLixeiraExpirada();

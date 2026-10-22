@@ -109,6 +109,8 @@ public class ProdutoService {
                     "O produto precisa estar na lixeira para ser excluído definitivamente."
             );
         }
+
+        produtoRepository.delete(produto);
     }
 
     public List<ProdutoResponseDto> consultar() {

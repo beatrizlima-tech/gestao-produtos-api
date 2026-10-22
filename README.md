@@ -167,10 +167,11 @@ O projeto utiliza testes de integração e testes unitários.
 - Verificação da chamada de exclusão dos produtos expirados
 - Verificação do cálculo da data limite de 30 dias
 - Verificação da chamada da Service pela Scheduler
+- Verificação da exclusão definitiva de produtos da lixeira
 
 O H2 Database é utilizado em memória no perfil de testes, isolando a execução do PostgreSQL principal.
 
-**Resultado da última execução: 8 testes aprovados, 0 falhas e 0 erros.**
+**Resultado da última execução: 9 testes aprovados, 0 falhas e 0 erros.**
 
 Para executar os testes:
 
@@ -219,6 +220,9 @@ $env:DB_PASSWORD = "SUA_SENHA_LOCAL"
 As configurações padrão de conexão estão disponíveis no arquivo `application.properties`.
 
 **Nunca publique credenciais reais no repositório.**
+
+O projeto disponibiliza um script SQL de referência em
+`src/main/java/br/com/cotiinformatica/api_produtos/sql/script.sql`.
 
 ### 3. Executar a aplicação
 

@@ -1,15 +1,17 @@
 # 📦 Gestão de Produtos — API REST
 
-API REST desenvolvida com **Java 21 e Spring Boot 4** para gerenciamento de produtos e controle de estoque.
+API REST desenvolvida com **Java 21 e Spring Boot 4.0.8** para gerenciamento de produtos e controle de estoque.
 
-O projeto integra uma aplicação **Full Stack**, com frontend desenvolvido em Angular e persistência de dados em PostgreSQL.
+O projeto integra uma aplicação **Full Stack**, com frontend desenvolvido em Angular e persistência de dados em
+PostgreSQL.
 
-Além das operações CRUD, a API implementa controle de estoque, registro automático de datas e uma lixeira com exclusão lógica, restauração e limpeza agendada após 30 dias.
+Além das operações CRUD, a API implementa controle de estoque, registro automático de datas e uma lixeira com exclusão
+lógica, restauração e limpeza agendada após 30 dias.
 
 ## 🛠️ Tecnologias
 
 - Java 21
-- Spring Boot 4
+- Spring Boot 4.0.8
 - Spring Web MVC
 - Spring Data JPA / Hibernate
 - PostgreSQL
@@ -23,9 +25,22 @@ Além das operações CRUD, a API implementa controle de estoque, registro autom
 - H2 Database (ambiente de testes)
 - Spring Scheduling
 
+## 🔐 Atualização de dependências
+
+As dependências do projeto são gerenciadas pelo Maven.
+
+O projeto utiliza Spring Boot 4.0.8, Springdoc OpenAPI 3.0.3 e PostgreSQL JDBC 42.7.14.
+
+Também foram ajustadas as versões transitivas de `jackson-databind` e `jackson-core` para 2.21.7, utilizadas pelo
+Swagger.
+
+As atualizações foram acompanhadas por análise de dependências no IntelliJ IDEA e execução da suíte automatizada de
+testes.
+
 ## 🚀 Funcionalidades
 
 **Gerenciamento de produtos**
+
 - Cadastro de produtos com nome, descrição, preço e quantidade
 - Listagem de produtos ativos
 - Consulta individual por ID
@@ -34,11 +49,13 @@ Além das operações CRUD, a API implementa controle de estoque, registro autom
 - Validação dos dados de entrada
 
 **Controle de datas**
+
 - Registro automático da data de cadastro
 - Atualização automática da data da última modificação
 - Registro da data de exclusão lógica
 
 **Lixeira de produtos**
+
 - Exclusão lógica (*Soft Delete*), preservando o registro no banco
 - Consulta dos produtos enviados à lixeira
 - Restauração dentro do prazo de 30 dias
@@ -47,6 +64,7 @@ Além das operações CRUD, a API implementa controle de estoque, registro autom
 - Limpeza automática diária dos registros com prazo expirado
 
 **Qualidade e documentação**
+
 - Tratamento de exceções e validações
 - Documentação interativa com Swagger UI
 - Testes automatizados com JUnit, Mockito, MockMvc e H2
@@ -65,13 +83,15 @@ A aplicação utiliza uma arquitetura em camadas, separando as responsabilidades
 - **DTOs:** definem os dados recebidos e devolvidos pela API.
 - **Scheduler:** executa periodicamente a rotina de limpeza da lixeira.
 
-A aplicação utiliza o `GlobalExceptionHandler` para centralizar o tratamento de erros de validação e recursos não encontrados, além do tratamento de conflitos operacionais no Controller.
+A aplicação utiliza o `GlobalExceptionHandler` para centralizar o tratamento de erros de validação e recursos não
+encontrados, além do tratamento de conflitos operacionais no Controller.
 
 ## 🗑️ Funcionamento da lixeira
 
 A exclusão de produtos utiliza o conceito de *Soft Delete*.
 
-Ao solicitar uma exclusão, o sistema registra a data e a hora da operação no campo `dataExclusao`, sem remover imediatamente o registro do banco.
+Ao solicitar uma exclusão, o sistema registra a data e a hora da operação no campo `dataExclusao`, sem remover
+imediatamente o registro do banco.
 
 Enquanto estiver na lixeira, o produto não aparece na listagem de estoque ativo.
 
@@ -79,22 +99,24 @@ O produto poderá ser restaurado antes de completar 30 dias desde sua exclusão.
 
 Após esse prazo, a restauração é bloqueada e o produto fica elegível à exclusão definitiva.
 
-A rotina automática utiliza o `@Scheduled` do Spring Boot, com execução programada diariamente às **03h (horário de Brasília)**.
+A rotina automática utiliza o `@Scheduled` do Spring Boot, com execução programada diariamente às **03h (horário de
+Brasília)**.
 
-A tarefa é executada enquanto a aplicação estiver em funcionamento. A remoção poderá ocorrer na primeira execução agendada posterior ao vencimento do prazo.
+A tarefa é executada enquanto a aplicação estiver em funcionamento. A remoção poderá ocorrer na primeira execução
+agendada posterior ao vencimento do prazo.
 
 ## 🔗 Endpoints
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/v1/produtos` | Listar produtos ativos |
-| GET | `/api/v1/produtos/{id}` | Buscar produto ativo por ID |
-| POST | `/api/v1/produtos` | Cadastrar produto |
-| PUT | `/api/v1/produtos/{id}` | Atualizar produto |
-| DELETE | `/api/v1/produtos/{id}` | Enviar produto à lixeira |
-| GET | `/api/v1/produtos/lixeira` | Consultar produtos excluídos |
-| PATCH | `/api/v1/produtos/{id}/restaurar` | Restaurar produto |
-| DELETE | `/api/v1/produtos/{id}/definitivo` | Excluir permanentemente |
+| Método | Endpoint                           | Descrição                    |
+|--------|------------------------------------|------------------------------|
+| GET    | `/api/v1/produtos`                 | Listar produtos ativos       |
+| GET    | `/api/v1/produtos/{id}`            | Buscar produto ativo por ID  |
+| POST   | `/api/v1/produtos`                 | Cadastrar produto            |
+| PUT    | `/api/v1/produtos/{id}`            | Atualizar produto            |
+| DELETE | `/api/v1/produtos/{id}`            | Enviar produto à lixeira     |
+| GET    | `/api/v1/produtos/lixeira`         | Consultar produtos excluídos |
+| PATCH  | `/api/v1/produtos/{id}/restaurar`  | Restaurar produto            |
+| DELETE | `/api/v1/produtos/{id}/definitivo` | Excluir permanentemente      |
 
 ## 📝 Exemplo de requisição
 
@@ -141,14 +163,14 @@ O campo `dataExclusao` permanece `null` enquanto o produto estiver ativo.
 
 ## 📡 Respostas HTTP
 
-| Código | Significado |
-|---|---|
-| 200 | Consulta, atualização, restauração ou exclusão lógica realizada |
-| 201 | Produto cadastrado |
-| 204 | Exclusão definitiva concluída, sem corpo na resposta |
-| 400 | Dados ou JSON inválidos |
-| 404 | Produto não encontrado |
-| 409 | Conflito com as regras de negócio |
+| Código | Significado                                                     |
+|--------|-----------------------------------------------------------------|
+| 200    | Consulta, atualização, restauração ou exclusão lógica realizada |
+| 201    | Produto cadastrado                                              |
+| 204    | Exclusão definitiva concluída, sem corpo na resposta            |
+| 400    | Dados ou JSON inválidos                                         |
+| 404    | Produto não encontrado                                          |
+| 409    | Conflito com as regras de negócio                               |
 
 ## 🧪 Testes automatizados
 
@@ -201,7 +223,8 @@ git clone https://github.com/beatrizlima-tech/gestao-produtos-api.git
 
 ### 2. Configurar o PostgreSQL
 
-Crie o banco de dados `bd-gestao-produtos` e configure a tabela `produtos` conforme o modelo de persistência da aplicação.
+Crie o banco de dados `bd-gestao-produtos` e configure a tabela `produtos` conforme o modelo de persistência da
+aplicação.
 
 A estrutura do banco deve contemplar os campos de descrição, cadastro, atualização e exclusão lógica.
 
@@ -222,7 +245,7 @@ As configurações padrão de conexão estão disponíveis no arquivo `applicati
 **Nunca publique credenciais reais no repositório.**
 
 O projeto disponibiliza um script SQL de referência em
-`src/main/java/br/com/cotiinformatica/api_produtos/sql/script.sql`.
+`src/main/java/io/github/beatrizlimatech/gestaoprodutos/sql/script.sql`.
 
 ### 3. Executar a aplicação
 

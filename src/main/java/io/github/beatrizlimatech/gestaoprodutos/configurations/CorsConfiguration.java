@@ -20,7 +20,7 @@ public class CorsConfiguration implements WebMvcConfigurer {
         registry
                 .addMapping("/**") //permissão para todos os ENDPOINTS
                 .allowedOrigins(corsAllowed) //projeto Angular
-                .allowedMethods("POST", "PUT", "DELETE", "GET")
+                .allowedMethods("POST", "PUT", "DELETE", "GET", "PATCH")
                 .allowedHeaders("*");
     }
 }

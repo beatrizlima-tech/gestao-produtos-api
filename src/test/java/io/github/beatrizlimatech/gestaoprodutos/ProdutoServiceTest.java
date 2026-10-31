@@ -10,10 +10,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -87,7 +89,32 @@ public class ProdutoServiceTest {
         //ASSERT
         verify(produtoRepository).delete(produto);
 
+    }
 
+    @Test
+    void deveCalcularTotalMonetarioSemImprecisao(){
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setNome("Produto de teste");
+        produto.setPreco(new BigDecimal("0.10"));
+        produto.setQuantidade(3);
+
+        when(produtoRepository.findById(1))
+                .thenReturn(Optional.of(produto));
+
+        //ACT
+        var resposta = produtoService.obterPorId(1);
+
+        //ASSERT
+        //R$ 0,10 x 3 deve resultar exatamente em R$ 0,30.
+        assertEquals(
+                0,
+                new BigDecimal(resposta.total().toString())
+                        .compareTo(new BigDecimal("0.30"))
+        );
     }
 
 }

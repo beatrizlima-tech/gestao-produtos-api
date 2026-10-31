@@ -11,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,7 +47,7 @@ class ApiProdutosApplicationTests {
         var request = new ProdutoRequestDto(
                 "Notebook Dell",
                 "Notebook Dell para trabalho e estudos",
-                5000.0,
+                new BigDecimal("5000.00"),
                 10
         );
 
@@ -67,7 +68,10 @@ class ApiProdutosApplicationTests {
         assertNotEquals(0, response.id());
         assertEquals(request.nome(), response.nome());
         assertEquals(request.descricao(), response.descricao());
-        assertEquals(request.preco(), response.preco());
+        assertEquals(
+                0,
+                request.preco().compareTo(response.preco())
+        );
         assertEquals(request.quantidade(), response.quantidade());
     }
 
@@ -106,7 +110,10 @@ class ApiProdutosApplicationTests {
         assertNotNull(response);
         assertEquals(produtoId, response.id());
         assertEquals("Notebook Dell", response.nome());
-        assertEquals(5000.0, response.preco());
+        assertEquals(
+                0,
+                new BigDecimal("5000.0").compareTo(response.preco())
+        );
         assertEquals(10, response.quantidade());
     }
 
@@ -117,7 +124,7 @@ class ApiProdutosApplicationTests {
         var request = new ProdutoRequestDto(
                 "Notebook Dell Gamer",
                 "Notebook gamer de alto desempenho.",
-                6500.0,
+                new BigDecimal("6500.00"),
                 8
         );
 
@@ -135,7 +142,10 @@ class ApiProdutosApplicationTests {
         assertEquals(produtoId, response.id());
         assertEquals(request.nome(), response.nome());
         assertEquals(request.descricao(), response.descricao());
-        assertEquals(request.preco(), response.preco());
+        assertEquals(
+                0,
+                request.preco().compareTo(response.preco())
+        );
         assertEquals(request.quantidade(), response.quantidade());
     }
 
@@ -152,5 +162,26 @@ class ApiProdutosApplicationTests {
         mockMvc.perform(get("/api/v1/produtos/" + produtoId)
                         .contentType("application/json"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Order(6)
+    void deveRejeitarPrecoComMaisDeDuasCasasDecimais() throws Exception {
+
+        //ARRANGE
+        String json = """
+                {
+                    "nome": "Produto de teste",
+                    "descricao": "Validação monetária",
+                    "preco": 10.123,
+                    "quantidade": 2
+                }
+                """;
+
+        //ACT e ASSERT
+        mockMvc.perform(post("/api/v1/produtos")
+                .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isBadRequest());
     }
 }

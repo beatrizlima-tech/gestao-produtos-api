@@ -24,7 +24,7 @@ public class ProdutoService {
 
         produto.setNome(request.nome());
         produto.setDescricao(request.descricao());
-        produto.setPreco(BigDecimal.valueOf(request.preco()));
+        produto.setPreco(request.preco());
         produto.setQuantidade(request.quantidade());
 
         produtoRepository.save(produto);
@@ -45,7 +45,7 @@ public class ProdutoService {
 
         produto.setNome(request.nome());
         produto.setDescricao(request.descricao());
-        produto.setPreco(BigDecimal.valueOf(request.preco()));
+        produto.setPreco(request.preco());
         produto.setQuantidade(request.quantidade());
 
         produtoRepository.save(produto);
@@ -155,13 +155,20 @@ public class ProdutoService {
     }
 
     private ProdutoResponseDto toResponse(Produto produto) {
+
+        BigDecimal preco = produto.getPreco();
+
+        BigDecimal total = preco.multiply(
+                BigDecimal.valueOf(produto.getQuantidade())
+        );
+
         return new ProdutoResponseDto(
                 produto.getId(),
                 produto.getNome(),
                 produto.getDescricao(),
-                produto.getPreco().doubleValue(),
+                preco,
                 produto.getQuantidade(),
-                produto.getPreco().doubleValue() * produto.getQuantidade(),
+                total,
                 produto.getDataCadastro(),
                 produto.getDataAtualizacao(),
                 produto.getDataExclusao()

@@ -3,3 +3,10 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    open-in-view: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

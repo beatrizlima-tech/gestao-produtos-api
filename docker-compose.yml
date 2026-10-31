@@ -9,6 +9,7 @@ services:
       - postgres
     environment:
       SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/apiprodutosdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Defina a senha do PostgreSQL no .env}

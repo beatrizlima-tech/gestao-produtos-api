@@ -9,7 +9,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 cors:
   allowed: http://localhost:4200,http://localhost:3000

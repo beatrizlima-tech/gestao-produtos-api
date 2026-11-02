@@ -184,4 +184,60 @@ class ApiProdutosApplicationTests {
                         .content(json))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    @Order(7)
+    void deveAceitarDescricaoCom500Caracteres() throws Exception {
+
+        // ARRANGE
+        String descricao = "A".repeat(500);
+
+        var request = new ProdutoRequestDto(
+                "Produto de teste",
+                descricao,
+                new BigDecimal("100.00"),
+                5
+        );
+
+        // ACT
+        var result = mockMvc.perform(post("/api/v1/produtos")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // ASSERT
+        var content = result.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        var response = objectMapper.readValue(
+                content,
+                ProdutoResponseDto.class
+        );
+
+        assertEquals(descricao, response.descricao());
+    }
+
+    @Test
+    @Order(8)
+    void deveRejeitarDescricaoCom501Caracteres() throws Exception {
+
+        // ARRANGE
+        String descricao = "A".repeat(501);
+
+        var request = new ProdutoRequestDto(
+                "Produto de teste",
+                descricao,
+                new BigDecimal("100.00"),
+                5
+        );
+
+        // ACT e ASSERT
+        mockMvc.perform(post("/api/v1/produtos")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
 }

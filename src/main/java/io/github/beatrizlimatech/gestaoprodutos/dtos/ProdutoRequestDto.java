@@ -10,7 +10,7 @@ public record ProdutoRequestDto(
         @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")
         String nome,
 
-        @Size(max = 150, message = "A descrição deve ter no máximo 500 caracteres.")
+        @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres.")
         String descricao,
 
         @NotNull(message = "O preço é obrigatório.")

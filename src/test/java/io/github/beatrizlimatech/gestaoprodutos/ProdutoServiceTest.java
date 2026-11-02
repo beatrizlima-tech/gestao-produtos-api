@@ -15,11 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProdutoServiceTest {
@@ -115,6 +113,118 @@ public class ProdutoServiceTest {
                 new BigDecimal(resposta.total().toString())
                         .compareTo(new BigDecimal("0.30"))
         );
+    }
+
+    @Test
+    void deveRestaurarProdutoExcluidoHaDezDias() {
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setNome("Produto de teste");
+        produto.setPreco(new BigDecimal("100.00"));
+        produto.setQuantidade(2);
+        produto.setDataExclusao(
+                LocalDateTime.now().minusDays(10)
+        );
+
+            when(produtoRepository.findById(1))
+                    .thenReturn(Optional.of(produto));
+
+        //ACT
+        var resposta = produtoService.restaurar(1);
+
+        //ASSERT
+        assertNull(produto.getDataExclusao());
+        assertNull(resposta.dataExclusao());
+
+        verify(produtoRepository).save(produto);
+
+    }
+
+    @Test
+    void naoDeveRestaurarProdutoComPrazoExpirado() {
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setDataExclusao(
+                LocalDateTime.now().minusDays(31)
+        );
+
+        when(produtoRepository.findById(1))
+                .thenReturn(Optional.of(produto));
+
+        //ACT
+        var excecao = assertThrows(
+                IllegalStateException.class,
+                () -> produtoService.restaurar(1)
+        );
+
+        //ASSERT
+        assertNotNull(produto.getDataExclusao());
+        assertEquals(
+                "O prazo de recuperação expirou.",
+                        excecao.getMessage()
+        );
+
+        verify(produtoRepository, never()).save(produto);
+    }
+
+    @Test
+    void naoDeveRestaurarProdutoAtivo() {
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setDataExclusao(null);
+
+        when(produtoRepository.findById(1))
+                .thenReturn(Optional.of(produto));
+
+        //ACT
+        var excecao = assertThrows(
+          IllegalStateException.class,
+        () -> produtoService.restaurar(1)
+        );
+
+        //ASSERT
+        assertNull(produto.getDataExclusao());
+        assertEquals("O produto não está na lixeira.",
+                excecao.getMessage());
+
+        verify(produtoRepository, never()).save(produto);
+
+    }
+
+    @Test
+    void naoDeveExcluirDefinitivamenteProdutoAtivo() {
+
+        //ARRANGE
+        var produto = new Produto();
+
+        produto.setId(1);
+        produto.setDataExclusao(null);
+
+        when(produtoRepository.findById(1))
+                .thenReturn(Optional.of(produto));
+
+        //ACT
+        var excecao = assertThrows(
+                IllegalStateException.class,
+                () -> produtoService.excluirDefinitivamente(1)
+        );
+
+        //ASSERT
+        assertNull(produto.getDataExclusao());
+        assertEquals("O produto precisa estar na lixeira para ser excluído definitivamente.",
+                excecao.getMessage());
+
+        verify(produtoRepository, never()).delete(produto);
+
     }
 
 }
